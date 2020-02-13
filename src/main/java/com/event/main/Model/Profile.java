@@ -1,11 +1,9 @@
 package com.event.main.Model;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "Profile")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Profile {
 

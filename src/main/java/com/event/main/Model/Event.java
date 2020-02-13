@@ -1,20 +1,18 @@
 package com.event.main.Model;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "name", "id", "url", "organization_id", "created", "changed", "published", "capacity",
 		"capacity_is_custom", "status" })
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Document(collection = "Event")
 public class Event{
 
 	@JsonProperty("name")
@@ -37,7 +35,9 @@ public class Event{
 	private Boolean capacityIsCustom;
 	@JsonProperty("status")
 	private String status;
-	
+	@JsonProperty("platforms")
+	private List<Platform> platforms;
+
 
 	@JsonProperty("name")
 	public Name getName() {
@@ -139,6 +139,6 @@ public class Event{
 		this.status = status;
 	}
 
-	
+
 
 }

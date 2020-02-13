@@ -1,17 +1,13 @@
 package com.event.main.Model;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Document(collection = "Profile")
 public class Attendees {
 
 	@JsonProperty("id")
@@ -22,7 +18,7 @@ public class Attendees {
 	private String eventId;
 	@JsonProperty("order_id")
 	private String orderId;
-	
+
 
 	@JsonProperty("id")
 	public String getId() {
@@ -46,6 +42,7 @@ public class Attendees {
 
 	@JsonProperty("event_id")
 	public String getEventId() {
+
 		return eventId;
 	}
 

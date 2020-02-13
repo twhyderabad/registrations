@@ -21,28 +21,19 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 @CrossOrigin
 public class AttendeesController {
 
-	
+
 	@Autowired
 	AttendeesService attendeesService;
-	
+
 	@PostMapping("/create")
 	public Attendees create(@RequestBody Attendees attendees) {
 		return attendeesService.create(attendees);
 	}
-	
-	
+
+
 	@GetMapping
 	public List<Attendees> get(){
 		return attendeesService.getAll();
 	}
-	
-	@GetMapping("/events")
-	public List<Event> getEvents() throws JsonMappingException, JsonProcessingException{
-		return attendeesService.getAllEvents();
-	}
-	
-	@GetMapping("/attendees")
-	public List<Attendees> getAttendees(@RequestParam("event_id") Long event_id) throws JsonMappingException, JsonProcessingException{
-		return attendeesService.getAttendeesOnEvent(event_id);
-	}
+
 }
