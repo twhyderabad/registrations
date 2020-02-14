@@ -4,7 +4,6 @@ import com.event.main.Model.Attendees;
 import com.event.main.Model.Event;
 import com.event.main.service.EventbriteServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,12 +20,17 @@ public class EventController {
     private EventbriteServiceImpl eventbriteServiceImpl;
 
     @GetMapping("/events")
-    public List<Event> getEvents() throws JsonMappingException, JsonProcessingException {
+    public List<Event> getEvents() {
         return eventbriteServiceImpl.getAllEvents();
     }
 
+    @GetMapping("/refresh-events")
+    public List<Event> refreshEvents() throws JsonProcessingException {
+        return eventbriteServiceImpl.refreshEvents();
+    }
+
     @GetMapping("/attendees")
-    public List<Attendees> getAttendees(@RequestParam("event_id") Long event_id) throws JsonMappingException, JsonProcessingException{
+    public List<Attendees> getAttendees(@RequestParam("event_id") Long event_id) {
         return eventbriteServiceImpl.getAttendeesOnEvent(event_id);
     }
 
