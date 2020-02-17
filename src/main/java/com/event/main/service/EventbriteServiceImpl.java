@@ -1,9 +1,7 @@
 package com.event.main.service;
 
-import com.event.main.Model.Attendees;
-import com.event.main.Model.AttendeesResponse;
-import com.event.main.Model.Event;
-import com.event.main.Model.Events;
+import com.event.main.Model.*;
+import com.event.main.PlatformName;
 import com.event.main.repository.AttendeesRepository;
 import com.event.main.repository.EventRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,9 +17,13 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EventbriteServiceImpl implements EventService {
+
+    private String EVENT_GET_URL = "https://www.eventbriteapi.com/v3/organizations/145300320016/events/?order_by=created_desc&page_size=500&status=completed";
+
 
     @Autowired
     RestTemplate restTemplate;
@@ -37,23 +39,40 @@ public class EventbriteServiceImpl implements EventService {
 
     @Override
     public List<Event> getAllEvents() {
-        List<Event> allEvents = new ArrayList<>();
+        return eventRepository.findAll();
+    }
+
+    public List<Event> refreshEvents() {
+        List<Event> savedEvents = new ArrayList<>();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer RXUSUF4IRERVKUOL2EH6");
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         try {
             ResponseEntity<String> events = restTemplate.exchange(
-                    "https://www.eventbriteapi.com/v3/organizations/145300320016/events/?order_by=created_desc&page_size=500&status=completed",
+                    EVENT_GET_URL,
                     HttpMethod.GET, entity, String.class);
-            System.out.println("events" + events);
             ObjectMapper objectMapper = new ObjectMapper();
-            allEvents = objectMapper.readValue(events.getBody(), Events.class).getEvents();
-            eventRepository.saveAll(allEvents);
+            List<Event> eventList = objectMapper.readValue(events.getBody(), Events.class).getEvents();
+
+            List<Event> saveEvents = addPlatformDetails(eventList);
+            System.out.println("events" + saveEvents);
+            savedEvents = eventRepository.saveAll(saveEvents);
 
         } catch (Exception e) {
-            LOGGER.error("ERROR" + e);
+            LOGGER.error("ERROR" + e.toString());
         }
-        return allEvents;
+        return savedEvents;
+    }
+
+    private List<Event> addPlatformDetails(List<Event> allEvents) {
+
+        return allEvents.stream().map(event -> {
+            List<Platform> platforms = new ArrayList<>();
+            platforms.add(new Platform(PlatformName.EVENTBRITE.name(), event.getId()));
+            event.setPlatforms(platforms);
+            event.setId(null);
+            return event;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -70,7 +89,7 @@ public class EventbriteServiceImpl implements EventService {
             attendees = objectMapper.readValue(events.getBody(), AttendeesResponse.class).getAttendees();
             attendeesRepository.saveAll(attendees);
         } catch (Exception e) {
-            LOGGER.error("error" + e);
+            LOGGER.error("error" + e.toString());
         }
         return attendees;
     }
