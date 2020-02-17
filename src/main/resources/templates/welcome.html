@@ -1,0 +1,80 @@
+<html lang="en">
+  <head>
+    <title>The Conference</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="Conference project" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="styles/bootstrap4/bootstrap.min.css"
+    />
+    <link
+      href="plugins/font-awesome-4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <link rel="stylesheet" type="text/css" href="styles/main_styles.css" />
+    <link rel="stylesheet" type="text/css" href="styles/responsive.css" />
+  </head>
+  <body>
+    <div class="super_container">
+      <div class="col text-center">
+        <div class="upcoming-events">Upcoming events</div>
+      </div>
+
+      <!-- Intro -->
+      <div class="intro">
+        <div
+          id="event"
+          class="intro_content d-flex flex-row flex-wrap align-items-start justify-content-between"
+        ></div>
+      </div>
+    </div>
+
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="styles/bootstrap4/popper.js"></script>
+    <script src="styles/bootstrap4/bootstrap.min.js"></script>
+
+    <script>
+      $body = $("body");
+
+      $(document).on({
+        ajaxStart: function() {
+          $body.append(
+            '<div class="lds-ring"><div></div><div></div><div></div><div></div></div>'
+          );
+        },
+        ajaxStop: function() {
+          $(".lds-ring").remove();
+        }
+      });
+
+      $.ajax({
+        type: "GET",
+        url: "http://localhost:8080/events",
+        success: function(data) {
+          var opts = $.parseJSON(JSON.stringify(data));
+          $.each(opts, function(i, d) {
+            $("#event").append(
+              '<div class="intro_item">' +
+                '<div class="intro_image">' +
+                '<img src="images/intro_1.jpg" alt="">' +
+                '</div><div class="intro_body">' +
+                '<div class="intro_title">' +
+                '<a href="#">' +
+                d.name.text +
+                "</a>" +
+                "</div>" +
+                '<div class="intro_subtitle">' +
+                '<button type="button" class="btn btn-primary" style=" margin-top: 20px;">Get All Attendees</button>' +
+                "</div></div></div>"
+            );
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
