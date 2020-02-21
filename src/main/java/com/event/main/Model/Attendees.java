@@ -16,6 +16,8 @@ public class Attendees {
     private Profile profile;
     @JsonProperty("event_id")
     private String eventId;
+    @JsonProperty("main_event_id")
+    private String mainEventId;
     @JsonProperty("order_id")
     private String orderId;
     @JsonProperty("attendance")
@@ -30,7 +32,6 @@ public class Attendees {
     public void setAttendance(Boolean attendance) {
         Attendance = attendance;
     }
-
 
     @JsonProperty("id")
     public String getId() {
@@ -52,17 +53,6 @@ public class Attendees {
         this.profile = profile;
     }
 
-    @JsonProperty("event_id")
-    public String getEventId() {
-
-        return eventId;
-    }
-
-    @JsonProperty("event_id")
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
-
     @JsonProperty("order_id")
     public String getOrderId() {
         return orderId;
@@ -72,5 +62,26 @@ public class Attendees {
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
+
+    @JsonProperty("event_id")
+    public String getEventId() {
+        return eventId;
+    }
+
+    @JsonProperty("event_id")
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
+    }
+
+    @JsonProperty("main_event_id")
+    public String getMainEventId() {
+        return mainEventId;
+    }
+
+    @JsonProperty("main_event_id")
+    public void setMainEventId(String mainEventId) {
+        this.mainEventId = mainEventId;
+    }
+
 
 }

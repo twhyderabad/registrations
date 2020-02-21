@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class UIController {
 
-	
+
 	@GetMapping
     public String main(Model model) {
-        
+
         return "welcome"; //view
     }
-	
+
 }

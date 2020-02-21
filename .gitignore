@@ -158,5 +158,5 @@ target/
 # Markdown Navigator plugin
 .idea/**/markdown-navigator.xml
 .idea/**/markdown-navigator/
-
+.DS_Store
 # End of https://www.gitignore.io/api/eclipse,intellij

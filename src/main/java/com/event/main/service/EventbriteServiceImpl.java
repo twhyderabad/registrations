@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,12 +18,17 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class EventbriteServiceImpl implements EventService {
 
-    private String EVENT_GET_URL = "https://www.eventbriteapi.com/v3/organizations/145300320016/events/?order_by=created_desc&page_size=500&status=completed";
+    @Value("${com.event.main.event.get.url}")
+    private String EVENT_GET_URL;
+
+    @Value("${com.event.main.event.attendees.get.url}")
+    private String EVENT_ATTENDEES_GET_URL;
 
 
     @Autowired
@@ -35,6 +41,9 @@ public class EventbriteServiceImpl implements EventService {
     @Autowired
     AttendeesRepository attendeesRepository;
 
+    @Autowired
+    SequenceGeneratorService sequenceGeneratorService;
+
     private Logger LOGGER = LoggerFactory.getLogger(EventbriteServiceImpl.class);
 
     @Override
@@ -42,21 +51,21 @@ public class EventbriteServiceImpl implements EventService {
         return eventRepository.findAll();
     }
 
+    public Optional<Event> getEvent(Long eventId) {
+        return eventRepository.findById(eventId);
+    }
+
+    @Override
     public List<Event> refreshEvents() {
         List<Event> savedEvents = new ArrayList<>();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer RXUSUF4IRERVKUOL2EH6");
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        HttpEntity<String> entity = getHeaderHttpEntity();
         try {
             ResponseEntity<String> events = restTemplate.exchange(
                     EVENT_GET_URL,
                     HttpMethod.GET, entity, String.class);
             ObjectMapper objectMapper = new ObjectMapper();
             List<Event> eventList = objectMapper.readValue(events.getBody(), Events.class).getEvents();
-
-            List<Event> saveEvents = addPlatformDetails(eventList);
-            System.out.println("events" + saveEvents);
-            savedEvents = eventRepository.saveAll(saveEvents);
+            savedEvents = eventRepository.saveAll(addPlatformDetails(eventList));
 
         } catch (Exception e) {
             LOGGER.error("ERROR" + e.toString());
@@ -70,27 +79,37 @@ public class EventbriteServiceImpl implements EventService {
             List<Platform> platforms = new ArrayList<>();
             platforms.add(new Platform(PlatformName.EVENTBRITE.name(), event.getId()));
             event.setPlatforms(platforms);
-            event.setId(null);
+            event.setId(sequenceGeneratorService.generateSequence(Event.SEQUENCE_NAME));
             return event;
         }).collect(Collectors.toList());
     }
 
     @Override
-    public List<Attendees> getAttendeesOnEvent(Long eventId) {
-        List<Attendees> attendees = new ArrayList<>();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer RXUSUF4IRERVKUOL2EH6");
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
+    public void refreshAttendeesOnEvent(Long platformEventId, Long eventId) {
+        HttpEntity<String> entity = getHeaderHttpEntity();
         try {
             ResponseEntity<String> events = restTemplate.exchange(
-                    "https://www.eventbriteapi.com/v3/events/" + eventId + "/attendees/", HttpMethod.GET, entity,
+                    String.format(EVENT_ATTENDEES_GET_URL, platformEventId), HttpMethod.GET, entity,
                     String.class);
             ObjectMapper objectMapper = new ObjectMapper();
-            attendees = objectMapper.readValue(events.getBody(), AttendeesResponse.class).getAttendees();
-            attendeesRepository.saveAll(attendees);
+            List<Attendees> attendees = objectMapper.readValue(events.getBody(), AttendeesResponse.class).getAttendees();
+            attendeesRepository.saveAll(addMainEventId(attendees, eventId));
         } catch (Exception e) {
             LOGGER.error("error" + e.toString());
         }
-        return attendees;
+    }
+
+    private HttpEntity<String> getHeaderHttpEntity() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer RXUSUF4IRERVKUOL2EH6");
+        return new HttpEntity<>(headers);
+    }
+
+    private List<Attendees> addMainEventId(List<Attendees> attendees, Long eventId) {
+        return attendees.stream().map(attendee -> {
+            attendee.setMainEventId(String.valueOf(eventId));
+            attendee.setAttendance(false);
+            return attendee;
+        }).collect(Collectors.toList());
     }
 }

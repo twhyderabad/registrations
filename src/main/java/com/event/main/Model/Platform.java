@@ -11,9 +11,9 @@ public class Platform {
     @JsonProperty("platform_name")
     private String platformName;
     @JsonProperty("platform_event_id")
-    private String platformEventId;
+    private Long platformEventId;
 
-    public Platform(String platformName, String platformEventId) {
+    public Platform(String platformName, Long platformEventId) {
         this.platformName = platformName;
         this.platformEventId = platformEventId;
     }
@@ -24,7 +24,7 @@ public class Platform {
     }
 
     @JsonProperty("platform_event_id")
-    public String getPlatformEventId() {
+    public Long getPlatformEventId() {
         return platformEventId;
     }
 
@@ -34,7 +34,7 @@ public class Platform {
     }
 
     @JsonProperty("platform_event_id")
-    public void setPlatformEventId(String platformEventId) {
+    public void setPlatformEventId(Long platformEventId) {
         this.platformEventId = platformEventId;
     }
 }

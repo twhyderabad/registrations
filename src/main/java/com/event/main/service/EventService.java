@@ -8,5 +8,7 @@ import java.util.List;
 public interface EventService {
     public List<Event> getAllEvents();
 
-    public List<Attendees> getAttendeesOnEvent(Long eventId);
+    public List<Event> refreshEvents();
+
+    public void refreshAttendeesOnEvent(Long platformEventId, Long eventId);
 }

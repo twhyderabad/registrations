@@ -4,9 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -16,10 +17,14 @@ import java.util.List;
 @Document(collection = "Event")
 public class Event {
 
+    @Transient
+    public static final String SEQUENCE_NAME = "events_sequence";
+
     @JsonProperty("name")
     private Name name;
     @JsonProperty("id")
-    private String id;
+    @Id
+    private Long id;
     @JsonProperty("url")
     private String url;
     @JsonProperty("organization_id")
@@ -42,12 +47,12 @@ public class Event {
     private EventTime start;
 
     @JsonProperty("id")
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
     @JsonProperty("id")
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

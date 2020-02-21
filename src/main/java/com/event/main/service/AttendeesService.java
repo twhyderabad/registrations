@@ -24,4 +24,10 @@ public class AttendeesService {
     public List<Attendees> getAll() {
         return attendeesRepository.findAll();
     }
+
+    public List<Attendees> getAttendeesOnEvent(String eventId) {
+        return attendeesRepository.findAllByMainEventId(eventId);
+    }
+
+
 }
